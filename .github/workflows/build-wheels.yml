@@ -40,7 +40,7 @@ jobs:
         CIBW_TEST_REQUIRES: numpy scipy pytest
         CIBW_TEST_COMMAND: python -c "import fastlr; print('Import successful')"
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: wheels
         path: ./wheelhouse/*.whl
