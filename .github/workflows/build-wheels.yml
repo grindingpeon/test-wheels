@@ -30,7 +30,6 @@ jobs:
           PKG_CONFIG_PATH=/usr/lib64/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
         CIBW_TEST_REQUIRES: numpy scipy pytest
         CIBW_TEST_COMMAND: python -c "import fastlr; print('Import successful')"
-
     - uses: actions/upload-artifact@v4
       with:
         name: wheels
