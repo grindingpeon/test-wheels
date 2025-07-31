@@ -36,6 +36,24 @@ jobs:
         name: wheels
         path: ./wheelhouse/*.whl
 
+
+  upload_release:
+    name: Upload wheels to GitHub Release
+    needs: build_wheels
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+      - name: Download built wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels
+          path: dist
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.whl
+
   # upload_pypi:
   #   needs: [build_wheels]
   #   runs-on: ubuntu-latest
