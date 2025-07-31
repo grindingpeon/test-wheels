@@ -49,10 +49,15 @@ jobs:
           name: wheels
           path: dist
 
+      - name: List dist contents
+        run: ls -lh dist
+
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*.whl
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }} 
 
   # upload_pypi:
   #   needs: [build_wheels]
