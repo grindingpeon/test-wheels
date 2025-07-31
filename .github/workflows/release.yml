@@ -1,0 +1,26 @@
+name: Upload wheels to GitHub Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  upload_release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download built wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels
+          path: dist
+
+      - name: List downloaded files
+        run: ls -lh dist
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.whl
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}

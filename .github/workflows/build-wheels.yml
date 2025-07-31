@@ -1,74 +1,35 @@
 name: Build wheels
 
 on:
-  push:
-    branches: [main]
   release:
-    types: [ published ]
+    types: [published]
+  workflow_dispatch:
+
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Build wheels
       uses: pypa/cibuildwheel@v3.1.1
       env:
         CIBW_BUILD: cp311-manylinux_x86_64 cp312-manylinux_x86_64
         CIBW_SKIP: "*-win32 *-win_amd64 *-macosx_*"
         CIBW_BEFORE_BUILD_LINUX: |
-            yum install -y epel-release
-            yum install -y armadillo-devel lapack-devel blas-devel cmake ninja-build pkgconfig
+          yum install -y epel-release
+          yum install -y armadillo-devel lapack-devel blas-devel cmake ninja-build pkgconfig
         CIBW_BEFORE_BUILD: |
           pip install meson-python pybind11 ninja meson
         CIBW_ENVIRONMENT_LINUX: >
           PKG_CONFIG_PATH=/usr/lib64/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
         CIBW_TEST_REQUIRES: numpy scipy pytest
         CIBW_TEST_COMMAND: python -c "import fastlr; print('Import successful')"
-    - uses: actions/upload-artifact@v4
+
+    - name: Upload wheel artifacts
+      uses: actions/upload-artifact@v4
       with:
         name: wheels
         path: ./wheelhouse/*.whl
-
-
-  upload_release:
-    name: Upload wheels to GitHub Release
-    needs: build_wheels
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
-    steps:
-      - name: Download built wheels
-        uses: actions/download-artifact@v4
-        with:
-          name: wheels
-          path: dist
-
-      - name: List dist contents
-        run: ls -lh dist
-
-      - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/*.whl
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }} 
-
-  # upload_pypi:
-  #   needs: [build_wheels]
-  #   runs-on: ubuntu-latest
-  #   if: github.event_name == 'release' && github.event.action == 'published'
-  #   steps:
-  #   - uses: actions/download-artifact@v3
-  #     with:
-  #       name: wheels
-  #       path: dist
-  #
-  #   - uses: pypa/gh-action-pypi-publish@release/v1
-  #     with:
-  #       user: __token__
-  #       password: ${{ secrets.PYPI_API_TOKEN }}
