@@ -16,27 +16,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-
     - name: Build wheels
-      uses: pypa/cibuildwheel@v2.20.0
+      uses: pypa/cibuildwheel@v3.1.1
       env:
-        # Build wheels for Python 3.11 and 3.12
         CIBW_BUILD: cp311-* cp312-*
-        # Build only manylinux wheels
         CIBW_SKIP: "*-win32 *-win_amd64 *-macosx_*"
-        # Install system dependencies before building
-        CIBW_BEFORE_ALL_LINUX: |
-          yum install -y epel-release
-          yum install -y armadillo-devel lapack-devel blas-devel cmake ninja-build pkgconfig
-        # Set environment variables for build
-        CIBW_ENVIRONMENT_LINUX: >
-          PKG_CONFIG_PATH=/usr/lib64/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
-          LDFLAGS="-L/usr/lib64 -larmadillo -llapack -lblas"
-          CPPFLAGS="-I/usr/include/armadillo"
-        # Install Python build dependencies
+        CIBW_BEFORE_BUILD_LINUX: |
+            yum install -y epel-release
+            yum install -y armadillo-devel lapack-devel blas-devel cmake ninja-build pkgconfig
         CIBW_BEFORE_BUILD: |
           pip install meson-python pybind11 ninja meson
-        # Test the wheels
+        CIBW_ENVIRONMENT_LINUX: >
+          PKG_CONFIG_PATH=/usr/lib64/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
         CIBW_TEST_REQUIRES: numpy scipy pytest
         CIBW_TEST_COMMAND: python -c "import fastlr; print('Import successful')"
 
