@@ -9,7 +9,7 @@ jobs:
   build_wheels:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-14]
+        os: [ubuntu-latest, macos-14]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -29,18 +29,6 @@ jobs:
             yum install -y armadillo-devel lapack-devel blas-devel cmake ninja-build pkgconfig
           CIBW_ENVIRONMENT_LINUX: >
             PKG_CONFIG_PATH=/usr/lib64/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
-
-          ## -------------------
-          ## Windows setup
-          ## -------------------
-          CIBW_BEFORE_BUILD_WINDOWS: |
-            curl -Ls https://micro.mamba.pm/api/micromamba/win-64/latest | tar -xvj bin/micromamba.exe
-            ./bin/micromamba.exe create -y -n buildenv -c conda-forge armadillo
-            echo "CIBW_CPPFLAGS=/c/micromamba/envs/buildenv/Library/include" >> %GITHUB_ENV%
-            echo "CIBW_LDFLAGS=/c/micromamba/envs/buildenv/Library/lib -larmadillo" >> %GITHUB_ENV%
-            echo "PATH=/c/micromamba/envs/buildenv/Library/bin;%PATH%" >> %GITHUB_ENV%
-          CIBW_ENVIRONMENT_WINDOWS: >
-            PATH="/c/micromamba/envs/buildenv/Library/bin:$PATH"
 
           ## -------------------
           ## macOS setup (Apple Silicon)
