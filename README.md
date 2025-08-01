@@ -23,8 +23,6 @@ R package `fastlr` and Python-bindings through
 Python package `fastlr`; the Python package also provides a pure Python
 implementation of the IRLS algorithm.
 
-misc.
-
 ## Usage
 
 ### Python

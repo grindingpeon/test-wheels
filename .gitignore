@@ -368,5 +368,4 @@ fastlr_0.1.0.tar.gz
 .github/workflows/build.yml
 fastlr.Rcheck
 files-to-copy.txt
-Dockerfile
 log.txt
