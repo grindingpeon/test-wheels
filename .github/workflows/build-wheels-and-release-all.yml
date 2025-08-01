@@ -2,7 +2,7 @@ name: Build wheels
 
 on:
   push:
-    branches: ["all-gha"]
+    branches: ["gha-windows-build"]
   workflow_dispatch:
 
 jobs:
