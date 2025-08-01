@@ -9,7 +9,7 @@ jobs:
   build_wheels:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-14]
+        os: [windows-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -22,22 +22,20 @@ jobs:
           CIBW_BUILD: cp311-* cp312-*
 
           ## -------------------
-          ## Linux setup
+          ## Windows setup
           ## -------------------
-          CIBW_BEFORE_BUILD_LINUX: |
-            yum install -y epel-release
-            yum install -y armadillo-devel lapack-devel blas-devel cmake ninja-build pkgconfig
-          CIBW_ENVIRONMENT_LINUX: >
-            PKG_CONFIG_PATH=/usr/lib64/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
 
-          ## -------------------
-          ## macOS setup (Apple Silicon)
-          ## -------------------
-          CIBW_BEFORE_BUILD_MACOS: |
-            brew update || true
-            brew install armadillo
-          CIBW_ENVIRONMENT_MACOS: >
-            PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig:/usr/local/lib/pkgconfig
+          CIBW_BEFORE_BUILD_WINDOWS: |
+            curl -L -o micromamba.exe https://micro.mamba.pm/api/micromamba/win-64/latest
+            mkdir C:\micromamba
+            move micromamba.exe C:\micromamba\
+            C:\micromamba\micromamba.exe create -y -p C:\buildenv -c conda-forge armadillo
+            echo CIBW_CPPFLAGS=C:\buildenv\Library\include>> %GITHUB_ENV%
+            echo CIBW_LDFLAGS=C:\buildenv\Library\lib -larmadillo>> %GITHUB_ENV%
+            echo PATH=C:\buildenv\Library\bin;%PATH%>> %GITHUB_ENV%
+
+          CIBW_ENVIRONMENT_WINDOWS: >
+            PATH=C:\buildenv\Library\bin;$PATH
 
           ## -------------------
           ## Shared setup
